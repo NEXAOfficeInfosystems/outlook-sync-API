@@ -75,16 +75,11 @@ namespace ServerSyncOutlookAddin
 
                 using (Process process = Process.Start(startInfo))
                 {
-                    // Wait for the user to select files and close the app
-                    process.WaitForExit();
+                    var result = WaitForAttachmentResult(tempResultPath, process, TimeSpan.FromMinutes(15));
 
-                    // Check if the result file exists
-                    if (File.Exists(tempResultPath))
+                    if (result != null)
                     {
-                        string json = File.ReadAllText(tempResultPath);
-                        var result = JsonConvert.DeserializeObject<OutlookAttachmentResult>(json);
-
-                        if (result != null && result.Files != null && result.Files.Any())
+                        if (result.Files != null && result.Files.Any())
                         {
                             int count = 0;
                             var missing = new List<string>();
@@ -110,9 +105,25 @@ namespace ServerSyncOutlookAddin
                                     MessageBoxIcon.Warning);
                             }
                         }
+                        else
+                        {
+                            MessageBox.Show(
+                                "No files were returned from OIS Sync. Click Attach on at least one document, then click Done & Close.",
+                                "No Attachments Selected",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+                        }
 
                         // Clean up the temp result file
                         try { File.Delete(tempResultPath); } catch { }
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            "Timed out waiting for OIS Sync to finish the attachment selection. Please click Attach on a document and then click Done & Close.",
+                            "Attachment Timed Out",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
                     }
                 }
             }
@@ -124,6 +135,60 @@ namespace ServerSyncOutlookAddin
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
+        }
+
+        private OutlookAttachmentResult WaitForAttachmentResult(string tempResultPath, Process process, TimeSpan timeout)
+        {
+            DateTime deadlineUtc = DateTime.UtcNow.Add(timeout);
+
+            while (DateTime.UtcNow < deadlineUtc)
+            {
+                try
+                {
+                    if (File.Exists(tempResultPath))
+                    {
+                        string json = File.ReadAllText(tempResultPath);
+                        if (!string.IsNullOrWhiteSpace(json))
+                        {
+                            var result = JsonConvert.DeserializeObject<OutlookAttachmentResult>(json);
+                            if (result != null)
+                            {
+                                return result;
+                            }
+                        }
+                    }
+                }
+                catch (IOException)
+                {
+                    // File may still be being written; retry.
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // File may still be locked; retry.
+                }
+                catch (JsonException)
+                {
+                    // Partial JSON while write is in progress; retry.
+                }
+
+                try
+                {
+                    if (process != null && process.HasExited)
+                    {
+                        // In single-instance mode the launcher process exits immediately,
+                        // but the already-running OIS Sync instance will write the file later.
+                    }
+                }
+                catch
+                {
+                    // Ignore process state errors and keep waiting on the temp file.
+                }
+
+                Application.DoEvents();
+                System.Threading.Thread.Sleep(250);
+            }
+
+            return null;
         }
 
         /// <summary>
