@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectItem>
+  <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="AddIn" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" />
+</ProjectItem>

@@ -1,0 +1,87 @@
+# ========================
+# Visual Studio
+# ========================
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# ========================
+# .NET / C#
+# ========================
+*.dll
+*.exe
+*.pdb
+*.lib
+*.exp
+*.ilk
+*.cache
+*.aps
+*.pch
+*.sbr
+*.idb
+*.nupkg
+*.snupkg
+project.lock.json
+packages/
+*.nuget.props
+*.nuget.targets
+
+# ========================
+# VSTO / Office Add-in
+# ========================
+*.vsto
+*.dll.manifest
+*.application
+publish/
+_PublishedWebsites/
+
+# ========================
+# Upgrade / Migration Logs
+# ========================
+UpgradeLog*.htm
+UpgradeLog*.xml
+_UpgradeReport_Files/
+
+# ========================
+# Temp / Generated Files
+# ========================
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+TempPE/
+*.FileListAbsolute.txt
+*.Up2Date
+
+# ========================
+# Extracted / Temp Docs
+# ========================
+extracted_docx/
+
+# ========================
+# OS Files
+# ========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
