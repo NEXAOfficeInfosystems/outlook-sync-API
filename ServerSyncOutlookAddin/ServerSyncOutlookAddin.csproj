@@ -13,8 +13,8 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <OfficeApplication>Outlook</OfficeApplication>
     <ProjectTypeGuids>{BAA0C2D2-18E2-41B9-852F-F413020CAA33};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ManifestCertificateThumbprint>8CC2812E6860E9A1DB0F0936CB3C93F07AE8308D</ManifestCertificateThumbprint>
-    <ManifestKeyFile>ServerSyncOutlookAddin_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestCertificateThumbprint>5E2DADD579A3DB9CB334DE56E691991997E0D04A</ManifestCertificateThumbprint>
+    <ManifestKeyFile>OIS_Sync.pfx</ManifestKeyFile>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
@@ -28,10 +28,10 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <PublishUrl>D:\Outlook Addin publish\</PublishUrl>
+    <PublishUrl>C:\inetpub\wwwroot\ServerSyncOutlookAddin\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.5</ApplicationVersion>
+    <ApplicationVersion>1.0.0.13</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -62,6 +62,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
@@ -100,8 +103,7 @@
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="ServerSyncOutlookAddin_1_TemporaryKey.pfx" />
-    <None Include="ServerSyncOutlookAddin_TemporaryKey.pfx" />
+    <None Include="OIS_Sync.pfx" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
