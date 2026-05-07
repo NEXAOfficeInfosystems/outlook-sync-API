@@ -79,27 +79,39 @@ namespace ServerSyncOutlookAddin
 
                     if (result != null)
                     {
+                        // User closed the OIS Sync popup without clicking Done & Close.
+                        // Nothing to attach — silently clean up and return.
+                        if (result.Cancelled)
+                        {
+                            try { File.Delete(tempResultPath); } catch { }
+                            return;
+                        }
+
                         if (result.Files != null && result.Files.Any())
                         {
                             int count = 0;
-                            var missing = new List<string>();
+                            var failed = new List<string>();
                             foreach (string filePath in result.Files)
                             {
-                                if (File.Exists(filePath))
+                                // Normalise the path (handles forward-slash, relative, or 8.3 variants)
+                                string normPath = filePath;
+                                try { normPath = Path.GetFullPath(filePath); } catch { }
+
+                                try
                                 {
-                                    mailItem.Attachments.Add(filePath);
+                                    mailItem.Attachments.Add(normPath);
                                     count++;
                                 }
-                                else
+                                catch
                                 {
-                                    missing.Add(Path.GetFileName(filePath));
+                                    failed.Add(Path.GetFileName(normPath));
                                 }
                             }
 
-                            if (missing.Any())
+                            if (failed.Any())
                             {
                                 MessageBox.Show(
-                                    $"Attached {count} file(s).\n\nThe following file(s) could not be found and were skipped:\n{string.Join("\n", missing)}",
+                                    $"Attached {count} file(s).\n\nThe following file(s) could not be attached and were skipped:\n{string.Join("\n", failed)}",
                                     "Partial Attachment",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Warning);
@@ -153,6 +165,8 @@ namespace ServerSyncOutlookAddin
                             var result = JsonConvert.DeserializeObject<OutlookAttachmentResult>(json);
                             if (result != null)
                             {
+                                // Return immediately whether the user completed or cancelled;
+                                // the caller inspects result.Cancelled to decide what to do.
                                 return result;
                             }
                         }
@@ -251,5 +265,15 @@ namespace ServerSyncOutlookAddin
 
         [JsonProperty("count")]
         public int Count { get; set; }
+
+        /// <summary>
+        /// True when the user closed the OIS Sync popup without clicking Done &amp; Close.
+        /// The Files list will be empty in this case.
+        /// </summary>
+        [JsonProperty("cancelled")]
+        public bool Cancelled { get; set; }
+
+        [JsonProperty("reason")]
+        public string Reason { get; set; }
     }
 }
