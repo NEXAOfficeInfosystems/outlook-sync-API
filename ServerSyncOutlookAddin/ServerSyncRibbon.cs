@@ -91,27 +91,36 @@ namespace ServerSyncOutlookAddin
                         {
                             int count = 0;
                             var failed = new List<string>();
+                            var failedReasons = new List<string>();
+
                             foreach (string filePath in result.Files)
                             {
-                                // Normalise the path (handles forward-slash, relative, or 8.3 variants)
                                 string normPath = filePath;
                                 try { normPath = Path.GetFullPath(filePath); } catch { }
 
                                 try
                                 {
+                                    // Check file exists and is readable before handing to Outlook
+                                    if (!File.Exists(normPath))
+                                        throw new FileNotFoundException($"File not found: {normPath}");
+
+                                    var fi = new FileInfo(normPath);
+                                    long sizeMB = fi.Length / (1024 * 1024);
+
                                     mailItem.Attachments.Add(normPath);
                                     count++;
                                 }
-                                catch
+                                catch (Exception ex)  // ← capture the actual exception
                                 {
                                     failed.Add(Path.GetFileName(normPath));
+                                    failedReasons.Add($"{Path.GetFileName(normPath)}: {ex.Message}");
                                 }
                             }
 
                             if (failed.Any())
                             {
                                 MessageBox.Show(
-                                    $"Attached {count} file(s).\n\nThe following file(s) could not be attached and were skipped:\n{string.Join("\n", failed)}",
+                                    $"Attached {count} file(s).\n\nFailed attachments:\n{string.Join("\n", failedReasons)}",
                                     "Partial Attachment",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Warning);
